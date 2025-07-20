@@ -9,12 +9,12 @@ import { Header } from "@/components/Header";
 import useFile from "@/hooks/useFile";
 
 export default function Index() {
-	const { items, isLoading, handleRefresh } = useFile();
+	const { files, isLoading, handleRefresh } = useFile();
 
 	useFocusEffect(
 		useCallback(() => {
 			handleRefresh();
-		}, [handleRefresh])
+		}, [])
 	);
 
 	return (
@@ -25,7 +25,7 @@ export default function Index() {
 				<FlatList
 					contentContainerStyle={{ gap: 10, marginTop: 10 }}
 					keyExtractor={(item) => item.id.toString()}
-					data={items}
+					data={files}
 					renderItem={({ item }) => <FileItem file={item} />}
 					ListEmptyComponent={() => (
 						<View style={styles.emptyContainer}>

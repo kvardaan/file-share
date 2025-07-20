@@ -1,22 +1,35 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
-import { TFileItem } from "@/lib/types";
+import useFile from "@/hooks/useFile";
+import { TFileItem } from "@/lib/types/file";
 
 export const FileItem: React.FC<{
 	file: TFileItem;
 }> = ({ file }) => {
+	const { deleteFile } = useFile();
+
 	return (
 		<View style={styles.fileContainer}>
 			<Ionicons name="musical-notes" size={24} color="red" style={styles.musicIcon} />
 			<View style={styles.fileTextContainer}>
-				<Text style={styles.sectionTitle}>{file.value}</Text>
-				<Text style={styles.sectionSubTitle}>{file.size}</Text>
+				<Text style={styles.sectionTitle}>{file.metadata.fileName}</Text>
+				<Text style={styles.sectionSubTitle}>{file.metadata.fileSize}</Text>
 			</View>
 			<Pressable
 				style={styles.actionButton}
 				accessibilityLabel="delete file item"
-				onPress={() => alert("show modal/pop-up to download, edit & delete")}
+				onPress={() => {
+					Alert.alert("Delete", "Are you sure you want to delete this file?", [
+						{ text: "Cancel" },
+						{
+							text: "Delete",
+							onPress: () => {
+								deleteFile(file.id.toString());
+							},
+						},
+					]);
+				}}
 			>
 				<Ionicons name="ellipsis-vertical" size={24} color="black" />
 			</Pressable>
