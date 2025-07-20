@@ -32,6 +32,7 @@ const useFile = (): iUseFile => {
 	};
 
 	const handleRefresh = () => {
+		console.log("refreshed");
 		fetchFileItems();
 	};
 

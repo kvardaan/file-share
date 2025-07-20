@@ -1,5 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -9,6 +10,12 @@ import useFile from "@/hooks/useFile";
 
 export default function Index() {
 	const { items, isLoading, handleRefresh } = useFile();
+
+	useFocusEffect(
+		useCallback(() => {
+			handleRefresh();
+		}, [handleRefresh])
+	);
 
 	return (
 		<SafeAreaView style={styles.container} edges={["top", "bottom", "left", "right"]}>
