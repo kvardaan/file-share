@@ -1,10 +1,11 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Stack } from "expo-router";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FileItem } from "@/components/FileItem";
+import { Header } from "@/components/Header";
 import { TFileItem } from "@/lib/types";
 
 const initFiles: TFileItem[] = [
@@ -15,24 +16,30 @@ const initFiles: TFileItem[] = [
 
 export default function Index() {
 	const [items, setItems] = useState<TFileItem[]>([]); // data will come from a backend api
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+
+	const fetchFileItems = async () => {
+		setIsLoading(true);
+		try {
+			setItems(initFiles);
+		} catch (error) {
+			console.error(error);
+			Alert.alert("Error", "Something went wrong");
+		}
+		setIsLoading(false);
+	};
 
 	useEffect(() => {
-		const fetchFileItems = async () => {
-			try {
-				setItems(initFiles);
-			} catch (error) {
-				console.error(error);
-				Alert.alert("Error", "Something went wrong");
-			}
-		};
-
 		fetchFileItems();
 	}, []);
 
+	const handleRefresh = () => {
+		fetchFileItems();
+	};
+
 	return (
 		<SafeAreaView style={styles.container} edges={["top", "bottom", "left", "right"]}>
-			<Stack.Screen options={{ headerShown: false }} />
-			<Text style={styles.header}>File Storage</Text>
+			<Header title="File Storage" />
 
 			<View style={{ flex: 1, marginHorizontal: 20 }}>
 				<FlatList
@@ -45,10 +52,12 @@ export default function Index() {
 							<Text style={styles.emptyMessage}>No files yet</Text>
 						</View>
 					)}
+					refreshing={isLoading}
+					refreshControl={<RefreshControl refreshing={isLoading} onRefresh={handleRefresh} />}
 				/>
 			</View>
 
-			<Pressable style={styles.addButton}>
+			<Pressable style={styles.addButton} onPress={() => router.push("/add")}>
 				<Ionicons size={28} name="add" color="white" />
 			</Pressable>
 		</SafeAreaView>
@@ -59,13 +68,6 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: "#eeeeee",
-	},
-	header: {
-		textAlign: "center",
-		fontWeight: 700,
-		fontSize: 20,
-		marginTop: 10,
-		marginBottom: 20,
 	},
 	emptyContainer: {
 		alignItems: "center",
