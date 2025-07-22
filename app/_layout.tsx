@@ -9,7 +9,15 @@ export default function RootLayout() {
 				<Stack.Screen name="index" />
 				<Stack.Screen
 					name="add"
-					options={{ presentation: "modal", animation: Platform.OS === "ios" ? "slide_from_bottom" : "slide_from_right" }}
+					options={{
+						presentation: "modal",
+						animation: Platform.OS === "ios" ? "slide_from_bottom" : "slide_from_right",
+						title: "Add File",
+						headerShown: true,
+						headerBackVisible: true,
+						headerTitleAlign: "center",
+						headerBackButtonDisplayMode: "generic",
+					}}
 				/>
 			</Stack>
 		</SafeAreaProvider>

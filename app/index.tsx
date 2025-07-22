@@ -6,10 +6,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FileItem } from "@/components/FileItem";
 import { Header } from "@/components/Header";
-import useFile from "@/hooks/useFile";
+import useFiles from "@/hooks/useFiles";
 
 export default function Index() {
-	const { files, isLoading, handleRefresh } = useFile();
+	const { files, loading, handleRefresh } = useFiles();
 
 	useFocusEffect(
 		useCallback(() => {
@@ -32,8 +32,8 @@ export default function Index() {
 							<Text style={styles.emptyMessage}>No files yet</Text>
 						</View>
 					)}
-					refreshing={isLoading}
-					refreshControl={<RefreshControl refreshing={isLoading} onRefresh={handleRefresh} />}
+					refreshing={loading}
+					refreshControl={<RefreshControl refreshing={loading} onRefresh={handleRefresh} />}
 				/>
 			</View>
 

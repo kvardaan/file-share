@@ -1,13 +1,22 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
-import useFile from "@/hooks/useFile";
+import useFile from "@/hooks/useFiles";
+import { downloadFile } from "@/lib/downloadFile";
 import { TFileItem } from "@/lib/types/file";
 
 export const FileItem: React.FC<{
 	file: TFileItem;
 }> = ({ file }) => {
 	const { deleteFile } = useFile();
+
+	const handleFileDelete = () => {
+		deleteFile(file.id.toString());
+	};
+
+	const handleFileDownload = () => {
+		downloadFile(file.url, file.metadata.fileName);
+	};
 
 	return (
 		<View style={styles.fileContainer}>
@@ -24,14 +33,15 @@ export const FileItem: React.FC<{
 						{ text: "Cancel" },
 						{
 							text: "Delete",
-							onPress: () => {
-								deleteFile(file.id.toString());
-							},
+							onPress: handleFileDelete,
 						},
 					]);
 				}}
 			>
 				<Ionicons name="ellipsis-vertical" size={24} color="black" />
+			</Pressable>
+			<Pressable style={styles.actionButton} onPress={handleFileDownload}>
+				<Ionicons name="download" size={24} color="black" />
 			</Pressable>
 		</View>
 	);
