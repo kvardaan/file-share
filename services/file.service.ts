@@ -1,9 +1,6 @@
-import axios from "axios";
-
 import * as FileAPI from "@/api/file";
-import { convertBase64ToUnit8Array } from "@/lib/utils";
 
-export const uploadFile = async (fileName: string, fileSize: number, fileType: string, fileData: string) => {
+export const uploadFile = async (fileName: string, fileSize: number, fileType: string, fileData: Blob) => {
 	try {
 		const { data } = await FileAPI.getSignedUrl({
 			fileName,
@@ -12,7 +9,9 @@ export const uploadFile = async (fileName: string, fileSize: number, fileType: s
 		});
 		const { url, fileName: formattedFileName } = data;
 
-		await axios.put(url, convertBase64ToUnit8Array(fileData), {
+		await fetch(url, {
+			method: "PUT",
+			body: fileData,
 			headers: {
 				"Content-Type": fileType,
 			},
