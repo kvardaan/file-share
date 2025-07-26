@@ -1,21 +1,25 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FileItem } from "@/components/FileItem";
 import { Header } from "@/components/Header";
-import useFiles from "@/hooks/useFiles";
+import { useFiles } from "@/lib/context/file";
 
 export default function Index() {
-	const { files, loading, handleRefresh } = useFiles();
+	const { files, loading, fetchFiles } = useFiles();
 
 	useFocusEffect(
 		useCallback(() => {
-			handleRefresh();
+			fetchFiles();
 		}, [])
 	);
+
+	const handleRefresh = () => {
+		fetchFiles();
+	};
 
 	return (
 		<SafeAreaView style={styles.container} edges={["top", "bottom", "left", "right"]}>
@@ -33,7 +37,7 @@ export default function Index() {
 						</View>
 					)}
 					refreshing={loading}
-					refreshControl={<RefreshControl refreshing={loading} onRefresh={handleRefresh} />}
+					onRefresh={handleRefresh}
 				/>
 			</View>
 

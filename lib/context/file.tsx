@@ -1,19 +1,31 @@
-import { useEffect, useState } from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
 
 import { getFiles } from "@/api/file";
 import { TFileItem } from "@/lib/types/file";
 import { removeFile } from "@/services/file.service";
 
-interface iUseFiles {
-	loading: boolean;
+interface IFileProps {
 	files: TFileItem[];
-	error: string | null;
-	handleRefresh: () => void;
 	deleteFile: (id: string) => Promise<void>;
+	fetchFiles: () => void;
+	loading: boolean;
+	error: string | null;
 }
 
-const useFiles = (): iUseFiles => {
+const FileContext = createContext<IFileProps>({
+	files: [],
+	deleteFile: async () => {},
+	fetchFiles: () => {},
+	loading: false,
+	error: null,
+});
+
+export const useFiles = () => {
+	return useContext(FileContext);
+};
+
+export const FileProvider = ({ children }: PropsWithChildren) => {
 	const [files, setFiles] = useState<TFileItem[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
@@ -46,15 +58,17 @@ const useFiles = (): iUseFiles => {
 		}
 	};
 
-	const handleRefresh = () => {
-		fetchFiles();
-	};
-
 	useEffect(() => {
 		fetchFiles();
 	}, []);
 
-	return { loading, files, error, handleRefresh, deleteFile };
-};
+	const value = {
+		files,
+		deleteFile,
+		fetchFiles,
+		loading,
+		error,
+	};
 
-export default useFiles;
+	return <FileContext.Provider value={value}>{children}</FileContext.Provider>;
+};

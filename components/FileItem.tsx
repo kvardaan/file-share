@@ -1,14 +1,15 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
-import useFile from "@/hooks/useFiles";
+import { useFiles } from "@/lib/context/file";
 import { downloadFile } from "@/lib/downloadFile";
 import { TFileItem } from "@/lib/types/file";
+import { formatBytes } from "@/lib/utils";
 
 export const FileItem: React.FC<{
 	file: TFileItem;
 }> = ({ file }) => {
-	const { deleteFile } = useFile();
+	const { deleteFile } = useFiles();
 
 	const handleFileDelete = () => {
 		deleteFile(file.id.toString());
@@ -23,7 +24,7 @@ export const FileItem: React.FC<{
 			<Ionicons name="musical-notes" size={24} color="red" style={styles.musicIcon} />
 			<View style={styles.fileTextContainer}>
 				<Text style={styles.sectionTitle}>{file.metadata.fileName}</Text>
-				<Text style={styles.sectionSubTitle}>{file.metadata.fileSize}</Text>
+				<Text style={styles.sectionSubTitle}>{formatBytes(file.metadata.fileSize)}</Text>
 			</View>
 			<Pressable
 				style={styles.actionButton}
@@ -38,10 +39,10 @@ export const FileItem: React.FC<{
 					]);
 				}}
 			>
-				<Ionicons name="ellipsis-vertical" size={24} color="black" />
+				<Ionicons name="trash-outline" size={24} color="black" />
 			</Pressable>
 			<Pressable style={styles.actionButton} onPress={handleFileDownload}>
-				<Ionicons name="download" size={24} color="black" />
+				<Ionicons name="download-outline" size={24} color="black" />
 			</Pressable>
 		</View>
 	);
