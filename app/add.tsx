@@ -1,10 +1,10 @@
 import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { allowedFileTypes, maxAllowedFileSize } from "@/lib/constants";
 import { uploadFile } from "@/services/file.service";
 
 const Edit = () => {
@@ -19,7 +19,7 @@ const Edit = () => {
 			const result = await DocumentPicker.getDocumentAsync({
 				copyToCacheDirectory: true,
 				base64: false,
-				type: ["audio/mpeg", "audio/wav", "audio/ogg", "audio/webm", "audio/mp3"],
+				type: allowedFileTypes,
 			});
 
 			if (result.canceled || !result.assets[0]) {
@@ -27,6 +27,12 @@ const Edit = () => {
 			}
 
 			const file = result.assets[0];
+
+			if (file.size && file.size > maxAllowedFileSize) {
+				// 50MB
+				Alert.alert("Error", "File size is too large");
+				return;
+			}
 
 			setFile(file);
 			setFileUri(file.uri);
@@ -45,13 +51,12 @@ const Edit = () => {
 		try {
 			setIsUploading(true);
 
-			const base64Data = await FileSystem.readAsStringAsync(fileUri, {
-				encoding: FileSystem.EncodingType.Base64,
-			});
-
+			const fileBlob = await (await fetch(fileUri)).blob();
+			console.log({ blobSize: fileBlob.size });
 			const fileType = `audio/${fileUri.split(".").pop()}`;
-
-			await uploadFile(fileName, fileSize, fileType, base64Data);
+			console.log({ fileType });
+			await uploadFile(fileName, fileSize, fileType, fileBlob);
+			console.log("uploaded");
 			Alert.alert("File uploaded successfully");
 			router.back();
 		} catch (error: any) {
@@ -84,7 +89,9 @@ const Edit = () => {
 					)}
 				</View>
 				<Pressable onPress={handleUpload} style={styles.uploadButton}>
-					<Text style={styles.uploadButtonText}>{isUploading ? "Uploading..." : "Upload File"}</Text>
+					<Text style={styles.uploadButtonText}>
+						{isUploading ? <ActivityIndicator color="white" size="small" /> : "Upload File"}
+					</Text>
 				</Pressable>
 			</View>
 		</SafeAreaView>
