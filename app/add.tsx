@@ -71,7 +71,6 @@ const Edit = () => {
 						placeholderTextColor="grey"
 						onChangeText={(text) => setFileName(text)}
 						style={styles.input}
-						// value={fileName || ""}
 					/>
 				</View>
 				<View style={{ gap: 8 }}>
@@ -117,6 +116,7 @@ const styles = StyleSheet.create({
 		borderRadius: 4,
 		borderColor: "#00000050",
 		fontSize: 16,
+		color: "black",
 	},
 	fileButton: {
 		padding: 12,
