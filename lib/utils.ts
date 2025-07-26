@@ -6,3 +6,13 @@ export const convertBase64ToUnit8Array = (base64String: string) => {
 	}
 	return bytes;
 };
+
+export const formatBytes = (bytes: number) => {
+	const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+	let i = 0;
+	while (bytes >= 1024 && i < sizes.length) {
+		bytes /= 1024;
+		i += 1;
+	}
+	return `${bytes.toFixed(2)} ${sizes[i]}`;
+};
