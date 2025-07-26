@@ -17,11 +17,6 @@ api.interceptors.response.use(
 	(error) => {
 		const status = error.response?.status;
 
-		if (status === 401) {
-			// @ts-ignore
-			window.location.href = "/login";
-		}
-
 		return Promise.reject({
 			message: error?.response?.data?.error || "Something went wrong",
 			status,
