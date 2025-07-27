@@ -4,10 +4,10 @@ import { useState } from "react";
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { allowedFileTypes, maxAllowedFileSize } from "@/lib/constants";
-import { uploadFile } from "@/services/file.service";
+import { allowedFileTypes, CHUNK_SIZE, maxAllowedFileSize } from "@/lib/constants";
+import { uploadLargeFile } from "@/services/file.service";
 
-const Edit = () => {
+const Add = () => {
 	const [file, setFile] = useState<DocumentPicker.DocumentPickerAsset | null>(null);
 	const [fileUri, setFileUri] = useState<string | null>(null);
 	const [fileName, setFileName] = useState<string | null>(null);
@@ -29,7 +29,6 @@ const Edit = () => {
 			const file = result.assets[0];
 
 			if (file.size && file.size > maxAllowedFileSize) {
-				// 50MB
 				Alert.alert("Error", "File size is too large");
 				return;
 			}
@@ -42,7 +41,7 @@ const Edit = () => {
 		}
 	};
 
-	const handleUpload = async () => {
+	const uploadLargeFileToS3 = async () => {
 		if (!fileUri || !fileSize || !fileName) {
 			Alert.alert("Error", "Incomplete fields");
 			return;
@@ -51,16 +50,15 @@ const Edit = () => {
 		try {
 			setIsUploading(true);
 
-			const fileBlob = await (await fetch(fileUri)).blob();
-			console.log({ blobSize: fileBlob.size });
 			const fileType = `audio/${fileUri.split(".").pop()}`;
-			console.log({ fileType });
-			await uploadFile(fileName, fileSize, fileType, fileBlob);
-			console.log("uploaded");
+			const totalParts = Math.ceil(fileSize / CHUNK_SIZE);
+
+			await uploadLargeFile(fileName, fileSize, fileType, fileUri, totalParts);
+
 			Alert.alert("File uploaded successfully");
 			router.back();
-		} catch (error: any) {
-			console.error(`Error uploading file: ${error}`);
+		} catch (error) {
+			console.error("uploadLargeFileToS3", error);
 		} finally {
 			setIsUploading(false);
 		}
@@ -88,7 +86,7 @@ const Edit = () => {
 						</Text>
 					)}
 				</View>
-				<Pressable onPress={handleUpload} style={styles.uploadButton}>
+				<Pressable onPress={uploadLargeFileToS3} style={styles.uploadButton}>
 					<Text style={styles.uploadButtonText}>
 						{isUploading ? <ActivityIndicator color="white" size="small" /> : "Upload File"}
 					</Text>
@@ -98,7 +96,7 @@ const Edit = () => {
 	);
 };
 
-export default Edit;
+export default Add;
 
 const styles = StyleSheet.create({
 	safeContainer: {
